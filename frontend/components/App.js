@@ -96,7 +96,7 @@ export default function App() {
         <div className="inputGroup">
           <label htmlFor="username">Username:</label>
           <input id="username" name="username" type="text" placeholder="Type Username" />
-          <div className="validation">username is required</div>
+          { errors.username && <div className="validation">username is required</div> }
         </div>
 
         <div className="inputGroup">
@@ -111,7 +111,7 @@ export default function App() {
               Rust
             </label>
           </fieldset>
-          <div className="validation">favLanguage is required</div>
+          {errors.favLanguage && <div className="validation">favLanguage is required</div> }
         </div>
 
         <div className="inputGroup">
@@ -122,7 +122,7 @@ export default function App() {
             <option value="spaghetti">Spaghetti</option>
             <option value="broccoli">Broccoli</option>
           </select>
-          <div className="validation">favFood is required</div>
+          { errors.favFood && <div className="validation">favFood is required</div> }
         </div>
 
         <div className="inputGroup">
@@ -130,7 +130,7 @@ export default function App() {
             <input id="agreement" type="checkbox" name="agreement" />
             Agree to our terms
           </label>
-          <div className="validation">agreement is required</div>
+          {errors.foo && <div className="validation">agreement is required</div>}
         </div>
 
         <div>
