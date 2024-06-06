@@ -1,6 +1,8 @@
 // ❗ The ✨ TASKS inside this component are NOT IN ORDER.
 // ❗ Check the README for the appropriate sequence to follow.
-import React from 'react'
+import React, {useState, useEffect}from 'react'
+import * as yup from "yup"
+import axios from 'axios'
 
 const e = { // This is a dictionary of validation error messages.
   // username
@@ -20,12 +22,48 @@ const e = { // This is a dictionary of validation error messages.
 
 // ✨ TASK: BUILD YOUR FORM SCHEMA HERE
 // The schema should use the error messages contained in the object above.
+// const formSchema = Yup.object().shape({
+//   username: yup
+//     .string()
+//     .required('username is required')
+//     .min(3, 'username must be at least 3 characters')
+//     .max(20, 'username cannot exceed 20 characters'),
+//   favLanguage: yup
+//     .string
+//     .required('favLanguage is required')
+//     .oneOf(['rust', 'javacript'],'favLanguage must be either javascript or rust'),
+//   favFood: yup
+//     .string
+//     .required('favFood is required')
+//     .oneOf(['broccoli', 'spaghetti', 'pizza'],'favFood must be either broccoli, spaghetti or pizza'), 
+//   agreement: yup
+//     .string
+//     .required('agreement is required')
+//     .boolean()
+//     .oneOf([true],'favLanguage must be either javascript or rust')
+// })
 
+const getInitialValues = () => ({
+  username: '',
+  favLanguage: '', 
+  favFood: '',
+  agreement: false
+})
+const getInitialErrors = () => ({
+  username: '',
+  favLanguage: '', 
+  favFood: '',
+  agreement: ''
+})
 export default function App() {
   // ✨ TASK: BUILD YOUR STATES HERE
   // You will need states to track (1) the form, (2) the validation errors,
   // (3) whether submit is disabled, (4) the success message from the server,
   // and (5) the failure message from the server.
+  const [values, setValues] = useState(getInitialValues())
+  const [errors, setErrors] = useState(getInitialErrors())
+  const [serverSuccess, setServerSuccess] = useState()
+  const [serverFailure, setServerFailure] = useState()
 
   // ✨ TASK: BUILD YOUR EFFECT HERE
   // Whenever the state of the form changes, validate it against the schema
@@ -51,9 +89,9 @@ export default function App() {
   return (
     <div> {/* TASK: COMPLETE THE JSX */}
       <h2>Create an Account</h2>
-      <form>
-        <h4 className="success">Success! Welcome, new user!</h4>
-        <h4 className="error">Sorry! Username is taken</h4>
+      <form onSubmit={onSubmit}>
+        {serverSuccess &&<h4 className="success">Success! Welcome, new user!</h4>}
+        {serverFailure &&<h4 className="error">Sorry! Username is taken</h4>}
 
         <div className="inputGroup">
           <label htmlFor="username">Username:</label>
