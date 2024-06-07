@@ -22,26 +22,25 @@ const e = { // This is a dictionary of validation error messages.
 
 // ✨ TASK: BUILD YOUR FORM SCHEMA HERE
 // The schema should use the error messages contained in the object above.
-// const formSchema = Yup.object().shape({
-//   username: yup
-//     .string()
-//     .required('username is required')
-//     .min(3, 'username must be at least 3 characters')
-//     .max(20, 'username cannot exceed 20 characters'),
-//   favLanguage: yup
-//     .string
-//     .required('favLanguage is required')
-//     .oneOf(['rust', 'javacript'],'favLanguage must be either javascript or rust'),
-//   favFood: yup
-//     .string
-//     .required('favFood is required')
-//     .oneOf(['broccoli', 'spaghetti', 'pizza'],'favFood must be either broccoli, spaghetti or pizza'), 
-//   agreement: yup
-//     .string
-//     .required('agreement is required')
-//     .boolean()
-//     .oneOf([true],'favLanguage must be either javascript or rust')
-// })
+const formSchema = yup.object().shape({
+  username: yup
+    .string().trim()
+    .required(e.usernameRequired)
+    .min(3, e.usernameMin)
+    .max(20, e.usernameMax),
+  favLanguage: yup
+    .string().trim()
+    .required(e.favLanguageRequired)
+    .oneOf(['rust', 'javacript'],e.favLanguageOptions),
+  favFood: yup
+    .string().trim()
+    .required(e.favFoodRequired)
+    .oneOf(['broccoli', 'spaghetti', 'pizza'],e.favFoodOptions), 
+  agreement: yup
+    .boolean()
+    .required(e.agreementRequired)
+    .oneOf([true],e.agreementOptions)
+}) 
 
 const getInitialValues = () => ({
   username: '',
@@ -64,6 +63,11 @@ export default function App() {
   const [errors, setErrors] = useState(getInitialErrors())
   const [serverSuccess, setServerSuccess] = useState()
   const [serverFailure, setServerFailure] = useState()
+  const [formEnabled, setFormEnabled] = useState(false)
+
+  useEffect(() => {
+    formSchema.isValid(values).then(setFormEnabled)
+  }, [values])
 
   // ✨ TASK: BUILD YOUR EFFECT HERE
   // Whenever the state of the form changes, validate it against the schema
@@ -75,6 +79,12 @@ export default function App() {
     // whether the type of event target is "checkbox" and act accordingly.
     // At every change, you should validate the updated value and send the validation
     // error to the state where we track frontend validation errors.
+    let {type, name, value, checked} = evt.target
+    value = type =='checkbox' ? checked : value
+    setValues({...values,[name]: value})
+    yup.reach(formSchema, name).validate(value)
+      .then(()=> setErrors({...errors, [name]: ''}))
+      .catch((err)=>setErrors({...errors, [name]:err.errors[0]}))
   }
 
   const onSubmit = evt => {
@@ -84,6 +94,17 @@ export default function App() {
     // the form. You must put the success and failure messages from the server
     // in the states you have reserved for them, and the form
     // should be re-enabled.
+    evt.preventDefault()
+    axios.post('https://webapis.bloomtechdev.com/registration', values)
+    .then(res => {
+      setValues(getInitialValues())
+      setServerSuccess(res.data.message)
+      setServerFailure()
+    })
+    .catch(err => {
+      setServerFailure(err.response.data.message)
+      setServerSuccess()
+    })
   }
 
   return (
@@ -134,7 +155,7 @@ export default function App() {
         </div>
 
         <div>
-          <input type="submit" disabled={false} />
+          <input disabled={!formEnabled} type="submit"/>
         </div>
       </form>
     </div>
